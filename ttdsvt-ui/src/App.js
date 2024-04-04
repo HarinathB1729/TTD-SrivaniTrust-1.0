@@ -16,22 +16,27 @@ import Profile from "./Authorized/Profile";
 import HomePage from "./Authorized/HomePage";
 import NewUser from "./Authorized/NewUser";
 import ChangePassword from "./Authorized/ChangePassword";
+import { useAuth } from "./Authorized/AuthProvider";
+import PageNotFound from "./Public/PageNotFound";
 
 function App() {
+  const { isAuthenticated }  = useAuth();
+
   return (
     <div className="App">
       <Router>
         <Routes>
           <Route exact path="/login" element={<Login />} />
-          <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} /> 
-            <Route path="/bhajanamandiralu" element={<BhajanaMandiralu />} />               
+          <Route element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/bhajanamandiralu" element={<BhajanaMandiralu />} />
             <Route path="/users" element={<Users />} />
             <Route path="/reports" element={<Reports />} />
-            <Route path="/profile" element={<Profile />} />  
-            <Route path="/newuser" element={<NewUser />} />  
-            <Route path="/changepwd" element={<ChangePassword />} />  
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/newuser" element={<NewUser />} />
+            <Route path="/changepwd" element={<ChangePassword />} />
           </Route>
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Router>
     </div>
