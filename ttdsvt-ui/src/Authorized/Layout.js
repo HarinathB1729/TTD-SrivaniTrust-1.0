@@ -9,7 +9,13 @@ function Layout() {
   return (
     <div>
       <Header />
-      <Container maxWidth={false} style={{ padding:'0px !important', backgroundImage: `url(${whiteBckgrnd})` }}>
+      <Container
+        maxWidth={false}
+        style={{
+          padding: "0px !important",
+          backgroundImage: `url(${whiteBckgrnd})`,
+        }}
+      >
         <Outlet />
       </Container>
       <Footer />

@@ -1,7 +1,9 @@
 import { TextField, Container, Typography, Button } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import DOMPurify from "dompurify";
+import api from "../api";
 
 function validatePassword(password) {
   const regex =
@@ -11,13 +13,14 @@ function validatePassword(password) {
 
 function ChangePassword() {
   const [pwdErr, setPwdErr] = useState(false);
-  const [cnfPwdError, setCnfPwdError] = useState("");
   const [cnfPwd, setCnfPwd] = useState("");
   const { isAuthenticated } = useAuth();
+  const token = isAuthenticated["token"];
   const [userCredentials, setUserCredentials] = useState({
-    username: "abc",
+    email: isAuthenticated["email"],
     password: "",
   });
+  const navigate = useNavigate();
 
   const checkingValidation = (password) => {
     if (validatePassword(password)) setPwdErr(false);
@@ -35,18 +38,31 @@ function ChangePassword() {
     checkingValidation(sanitized_value);
   };
 
-  const formDataHandler = (e) => {
-    e.preventDefault();
-  };
-
   const confirmPwdHandler = (e) => {
     setCnfPwd(e.target.value);
-    if (e.target.value !== userCredentials.password) setCnfPwdError(true);
-    else setCnfPwdError(false);
   };
 
-  // console.log("userCredentials", userCredentials);
-  // console.log("cnfpwd", cnfPwd);
+  const formDataHandler = (e) => {
+    e.preventDefault();
+
+    api
+      .patch("users/changepwd/", userCredentials, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log("response", res);
+        window.alert(res.data["message"]);
+        navigate("/auth/");
+      })
+      .catch((err) => {
+        console.log("Error :", err);
+      });
+  };
+
+  console.log("userCredentials", userCredentials);
+  console.log("cnfpwd", cnfPwd);
 
   return (
     <>
@@ -100,11 +116,11 @@ function ChangePassword() {
             autoComplete="off"
             onChange={confirmPwdHandler}
             placeholder="Confirm Password"
-            // error={userCredentials.password !== cnfPwd}
+            error={userCredentials.password !== cnfPwd}
           />
-          {cnfPwdError && (
+          {userCredentials.password !== cnfPwd && (
             <Typography
-              sx={{ float: "left", color: "red", marginBottom: "20px" }}
+              sx={{ float: "center", color: "red", marginBottom: "20px" }}
               fontSize={13}
             >
               Passwords Didn't Match

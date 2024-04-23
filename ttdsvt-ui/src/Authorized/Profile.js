@@ -1,19 +1,26 @@
-import { Container, TextField, Typography } from "@mui/material";
-import React, { useState, useEffect } from "react";
-import { Button } from "@mui/material";
+import { Container, TextField, Typography, Button } from "@mui/material";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api";
+import { useAuth } from "./AuthProvider";
 
 function Profile() {
+  const { isAuthenticated } = useAuth();
+  const token = isAuthenticated["token"];
   const [edit, setEdit] = useState(true);
-  const [errMsg, setErrMsg] = useState(false);
-  const [error, setError] = useState(false);
-  const [err, setErr] = useState(false);
-  const [changeInData, setChangeInData]= useState(false);
+  const [changeInData, setChangeInData] = useState(false);
+  const navigate = useNavigate();
 
   const profile_init_values = {
-    username: "abc",
-    role: "role",
+    username: isAuthenticated["username"],
+    email: isAuthenticated["email"],
+    role: isAuthenticated["role"],
   };
   const [profileData, setProfileData] = useState(profile_init_values);
+  const [usernameError, setUsernameError] = useState({
+    error: false,
+    message: "",
+  });
 
   const profileDataHandler = (e) => {
     setProfileData((prev) => ({
@@ -23,15 +30,55 @@ function Profile() {
     setChangeInData(true);
   };
 
-  const formSubmitHandler = (e) => {
-    e.preventDefault();
+  const clearDataHandler = () => {
+    setProfileData(profile_init_values);
+    setChangeInData(false);
+    setEdit(true);
+    setUsernameError({
+      error: false,
+      message: "",
+    });
   };
 
-  console.log("profiledata", profileData);
+  const formSubmitHandler = (e) => {
+    e.preventDefault();
+
+    api
+      .patch("users/usernameupdate/", profileData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        // console.log("response", res);
+        window.alert(res.data["message"]);
+        navigate("/");
+      })
+      .catch((err) => {
+        // console.log("Error :", err);
+        setChangeInData(false);
+        if (err.response.data.username)
+          setUsernameError({
+            error: true,
+            message: err.response.data.username[0],
+          });
+
+        if (err.response.data.error)
+          setUsernameError({
+            error: true,
+            message: err.response.data.error,
+          });
+      });
+  };
+
+  // console.log("profiledata", profileData);
+
   return (
     <>
       <div className="center" style={{ height: "15vh" }}>
-        <h2 style={{ color: "#B31B1B" }}>Profile</h2>
+        <h2 style={{ color: "#B31B1B" }}>
+          {edit ? "User Profile" : "Update Username"}
+        </h2>
       </div>
       <Container
         sx={{
@@ -42,6 +89,21 @@ function Profile() {
         }}
       >
         <form onSubmit={formSubmitHandler} autoComplete="off">
+          <TextField
+            sx={{ margin: "20px 0" }}
+            required
+            fullWidth
+            name="email"
+            type="email"
+            value={profileData?.email}
+            placeholder="Email *"
+            label="Email"
+            variant="outlined"
+            onChange={profileDataHandler}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
           <TextField
             sx={{ margin: "20px 0" }}
             required={true}
@@ -55,21 +117,29 @@ function Profile() {
               readOnly: edit,
             }}
             onChange={profileDataHandler}
-            error={error}
+            error={usernameError?.error}
           />
+          {usernameError.error && (
+            <Typography
+              sx={{ color: "red", fontSize: "0.8em", textAlign: "left" }}
+            >
+              {usernameError.message}
+            </Typography>
+          )}
+
           <TextField
+            name="role"
+            variant="outlined"
+            label="Role"
             sx={{ margin: "20px 0" }}
             fullWidth
             required={true}
-            name="role"
-            label="Role"
             onChange={profileDataHandler}
             value={profileData?.role}
-            placeholder="Your Role"
+            placeholder="New Role"
             InputProps={{
               readOnly: true,
             }}
-            error={err}
           />
           {edit && (
             <Button
@@ -106,11 +176,7 @@ function Profile() {
                   width: "50%",
                   margin: "20px 0px 20px 10px",
                 }}
-                onClick={() => {
-                  setProfileData(profile_init_values);
-                  setChangeInData(false);
-                  setEdit(true);
-                }}
+                onClick={clearDataHandler}
               >
                 Cancel
               </Button>

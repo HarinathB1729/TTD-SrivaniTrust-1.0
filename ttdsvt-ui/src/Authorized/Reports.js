@@ -1,18 +1,12 @@
-import {
-  Box,
-  Container,
-  FormControl,
-  Checkbox,
-  ListItemText,
-  MenuItem,
-} from "@mui/material";
+import { Box, Container, MenuItem } from "@mui/material";
 import React, { useState } from "react";
 import DOMPurify from "dompurify";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { Typography } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
+import api from "../api";
+import { useAuth } from "./AuthProvider";
 
 const textBoxStyles = {
   backgroundColor: "white",
@@ -39,36 +33,39 @@ const MenuProps = {
   },
 };
 
-
 const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder",
+  "Anantapur",
+  "Chittoor",
+  "East Godavari",
+  "Guntur",
+  "Krishna",
+  "Kurnool",
+  "Prakasam",
+  "Sri Potti Sriramulu Nellore",
+  "Srikakulam",
+  "Visakhapatnam",
+  "Vizianagaram",
+  "West Godavari",
+  "YSR Kadapa",
 ];
 
 function Reports() {
-  const [error, setError] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  const { isAuthenticated } = useAuth();
+  const token = isAuthenticated["token"];
+
   const reports_init_values = {
     district: "",
     mandal: "",
-    panchayat:'',
+    panchayat: "",
     ward: "",
     colony: "",
     referred: "",
     startdate: "",
-    enddate:''
+    enddate: "",
   };
 
   const [reports, setReports] = useState(reports_init_values);
-  const [personName, setPersonName] = useState([]);
+  const [reportsData, setReportsData] = useState([]);
 
   const clearDataHandler = (e) => {
     e.preventDefault();
@@ -85,206 +82,225 @@ function Reports() {
     }));
   };
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+  const printingDocument = () => {
+    // Convert JSON to a readable string with indentation
+    let jsonString = JSON.stringify(reportsData, null, 2);
+
+    // Open a new window or tab
+    let printWindow = window.open("", "_blank");
+    printWindow.document.write("<pre>" + jsonString + "</pre>");
+
+    // Trigger the print functionality
+    printWindow.print();
   };
 
   const formSubmitHandler = (e) => {
     e.preventDefault();
+
+    api
+      .post("users/reports/", reports, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        // console.log("response", res);
+        if (res.data) {
+          setReportsData(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log("Error :", err);
+      });
   };
 
-  console.log("reports",reports)
-
+  // console.log("reports", reports);
+  // console.log("isauthenticated", isAuthenticated);
+  // console.log("reportsdata", reportsData);
   return (
     <>
       <div className="center" style={{ height: "15vh" }}>
         <h2 style={{ color: "#B31B1B" }}>Reports</h2>
       </div>
       <Container sx={{ border: "1px solid grey", minHeight: "58vh" }}>
-        <form onSubmit={formSubmitHandler} autoComplete="off">
-          <FormControl>
-            <Grid style={{ marginTop: "20px" }} container>
-              <Grid item xs={3}>
-                <Box style={{ padding: "0 10px", textAlign: "left" }}>
-                  <br />
-                  <TextField
-                    style={textBoxStyles}
-                    select
-                    name="district"
-                    label="Name of the District"
-                    placeholder="Name of the District"
-                    SelectProps={{
-                      multiple: true,
-                      value: personName,
-                      onChange: handleChange,
-                      renderValue: (selected) => selected.join(", "),
-                      MenuProps: MenuProps,
-                    }}
-                    variant="outlined"
-                  >
-                    {names.map((name) => (
-                      <MenuItem key={name} value={name}>
-                        <Checkbox  checked={personName.indexOf(name) > -1}/>
-                        <ListItemText primary={name} />
-                      </MenuItem>
-                    ))}
-                  </TextField>
-
-                  <br />
-                  <br />
-                  <TextField
-                    style={textBoxStyles}
-                    required
-                    name="colony"
-                    placeholder="Colony"
-                    variant="outlined"
-                    label="Colony"
-                    onChange={dataHandler}
-                    value={reports?.colony}
-                    error={error}
-                  />
-                  <br />
-
-                  <br />
-                </Box>
-              </Grid>
-              <Grid item xs={3}>
-                <Box style={boxStyles}>
-                  <br />
-                  <TextField
-                    style={textBoxStyles}
-                    required
-                    name="mandal"
-                    value={reports?.mandal}
-                    placeholder="Mandal"
-                    label="Mandal"
-                    variant="outlined"
-                    onChange={dataHandler}
-                  />
-                  <br /> <br />
-                  <TextField
-                    style={textBoxStyles}
-                    required
-                    name="referred"
-                    value={reports?.referred}
-                    label="Referred"
-                    onChange={dataHandler}
-                    placeholder="Referred"
-                  />
-                  <br />
-                  <br />
-                </Box>
-              </Grid>
-              <Grid item xs={3}>
-                <Box style={boxStyles}>
-                  <br />
-                  <TextField
-                    style={textBoxStyles}
-                    required
-                    name="panchayat"
-                    placeholder="Panchayat"
-                    variant="outlined"
-                    label="Panchayat"
-                    onChange={dataHandler}
-                    value={reports?.panchayat}
-                    error={error}
-                  />
-                  {error && (
-                    <Typography sx={{ color: "red", fontSize: "0.8em" }}>
-                      {errMsg}
-                    </Typography>
-                  )}
-                  <br />
-                  <br />
-                  <TextField
-                    style={textBoxStyles}
-                    required
-                    name="startdate"
-                    placeholder="Start Date"
-                    variant="outlined"
-                    type="date"
-                    label="Start Date"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange={dataHandler}
-                    value={reports?.startdate}
-                    error={error}
-                  />
-                  <br />
-
-                  <br />
-                </Box>
-              </Grid>
-              <Grid item xs={3}>
-                <Box style={boxStyles}>
-                  <br />
-                  <TextField
-                    style={textBoxStyles}
-                    required
-                    name="ward"
-                    value={reports?.ward}
-                    placeholder="Ward"
-                    label="Ward"
-                    variant="outlined"
-                    onChange={dataHandler}
-                  />
-                  <br /> <br />
-                  <TextField
-                    style={textBoxStyles}
-                    required
-                    name="enddate"
-                    value={reports?.enddate}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    label="End Date"
-                    type="date"
-                    onChange={dataHandler}
-                    // placeholder="End Date"
-                  />
-                  <br />
-                  <br />
-                </Box>
-              </Grid>
-              <br />
-              <br />
-              <Grid
-                item
-                xs={12}
-                className="center"
-                style={{ marginTop: "10px", gap: "50px" }}
-              >
-                <Button
-                  style={{ width: "100px" }}
-                  variant="contained"
-                  type="submit"
+        <form
+          name="report_form"
+          onSubmit={formSubmitHandler}
+          autoComplete="off"
+        >
+          <Grid style={{ marginTop: "20px" }} container>
+            <Grid item xs={3}>
+              <Box style={{ padding: "0 10px", textAlign: "left" }}>
+                <br />
+                <TextField
+                  style={textBoxStyles}
+                  select
+                  required
+                  name="district"
+                  label="Name of the District"
+                  placeholder="Name of the District"
+                  SelectProps={{
+                    value: reports?.district,
+                    onChange: dataHandler,
+                    renderValue: (selected) => selected,
+                    MenuProps: MenuProps,
+                  }}
+                  variant="outlined"
+                  InputLabelProps={{
+                    htmlFor: "district", // This should match the id of the input field
+                  }}
                 >
-                  submit
-                </Button>
+                  {names.map((name) => (
+                    <MenuItem key={name} value={name}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </TextField>
 
-                <Button
-                  style={{ width: "100px" }}
-                  variant="contained"
-                  color="error"
-                  onClick={clearDataHandler}
-                >
-                  Clear
-                </Button>
-              </Grid>
+                <br />
+                <br />
+                <TextField
+                  style={textBoxStyles}
+                  name="colony"
+                  placeholder="Colony"
+                  variant="outlined"
+                  label="Colony"
+                  onChange={dataHandler}
+                  value={reports?.colony}
+                />
+                <br />
+
+                <br />
+              </Box>
             </Grid>
-          </FormControl>
+            <Grid item xs={3}>
+              <Box style={boxStyles}>
+                <br />
+                <TextField
+                  style={textBoxStyles}
+                  name="mandal"
+                  value={reports?.mandal}
+                  placeholder="Mandal"
+                  label="Mandal"
+                  variant="outlined"
+                  onChange={dataHandler}
+                />
+                <br /> <br />
+                <TextField
+                  style={textBoxStyles}
+                  name="referred"
+                  value={reports?.referred}
+                  label="Referred"
+                  onChange={dataHandler}
+                  placeholder="Referred"
+                />
+                <br />
+                <br />
+              </Box>
+            </Grid>
+            <Grid item xs={3}>
+              <Box style={boxStyles}>
+                <br />
+                <TextField
+                  style={textBoxStyles}
+                  name="panchayat"
+                  placeholder="Panchayat"
+                  variant="outlined"
+                  label="Panchayat"
+                  onChange={dataHandler}
+                  value={reports?.panchayat}
+                />
+
+                <br />
+                <br />
+                <TextField
+                  style={textBoxStyles}
+                  name="startdate"
+                  placeholder="Start Date"
+                  variant="outlined"
+                  type="date"
+                  label="Start Date"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  onChange={dataHandler}
+                  value={reports?.startdate}
+                />
+                <br />
+
+                <br />
+              </Box>
+            </Grid>
+            <Grid item xs={3}>
+              <Box style={boxStyles}>
+                <br />
+                <TextField
+                  style={textBoxStyles}
+                  name="ward"
+                  value={reports?.ward}
+                  placeholder="Ward"
+                  label="Ward"
+                  variant="outlined"
+                  onChange={dataHandler}
+                />
+                <br /> <br />
+                <TextField
+                  style={textBoxStyles}
+                  name="enddate"
+                  value={reports?.enddate}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  label="End Date"
+                  type="date"
+                  onChange={dataHandler}
+                  // placeholder="End Date"
+                />
+                <br />
+                <br />
+              </Box>
+            </Grid>
+            <br />
+            <br />
+            <Grid
+              item
+              xs={12}
+              className="center"
+              style={{ marginTop: "10px", gap: "50px" }}
+            >
+              <Button
+                style={{ width: "100px" }}
+                variant="contained"
+                type="submit"
+                disabled={
+                  !reports?.district &&
+                  !reports?.colony &&
+                  !reports?.enddate &&
+                  !reports?.startdate &&
+                  !reports?.mandal &&
+                  !reports?.panchayat &&
+                  !reports?.referred &&
+                  !reports?.ward
+                }
+              >
+                submit
+              </Button>
+
+              <Button
+                style={{ width: "100px" }}
+                variant="contained"
+                color="error"
+                onClick={clearDataHandler}
+              >
+                Clear
+              </Button>
+            </Grid>
+          </Grid>
         </form>
 
         <Container className="center" style={generatedReportStyle}>
-          <h2>Generated Report</h2>
-          <PrintIcon />
+          <h2>{reportsData.length > 0 ? "Generated Report" : "No Data "}</h2>
+          {reportsData.length > 0 && <PrintIcon onClick={printingDocument} />}
         </Container>
       </Container>
     </>

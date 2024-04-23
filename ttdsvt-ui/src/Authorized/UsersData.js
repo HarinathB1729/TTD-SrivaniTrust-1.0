@@ -12,6 +12,7 @@ import TablePagination from "@mui/material/TablePagination";
 import { Box, Button } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { NavLink } from "react-router-dom";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -67,9 +68,9 @@ export default function UsersData(props) {
           }}
         >
           <h2>Users Data</h2>
-          <NavLink to="/newuser">
-            <Button style={{textTransform: 'none'}}>
-              <AddRoundedIcon style={{color:"black"}} /> Add New User
+          <NavLink to="/auth/newuser">
+            <Button style={{ textTransform: "none" }}>
+              <AddRoundedIcon style={{ color: "black" }} /> Add New User
             </Button>
           </NavLink>
         </Box>
@@ -78,8 +79,6 @@ export default function UsersData(props) {
             <TableRow>
               <StyledTableCell>Username</StyledTableCell>
               <StyledTableCell align="left">Email</StyledTableCell>
-              <StyledTableCell align="left">Password</StyledTableCell>
-              {/* <StyledTableCell align="left">Confirm Password</StyledTableCell> */}
               <StyledTableCell align="left">Phone no.</StyledTableCell>
               <StyledTableCell align="left">Role</StyledTableCell>
               <StyledTableCell align="left">Permission</StyledTableCell>
@@ -99,13 +98,18 @@ export default function UsersData(props) {
                   {row?.username}
                 </StyledTableCell>
                 <StyledTableCell align="left">{row?.email}</StyledTableCell>
-                <StyledTableCell align="left">{row?.password}</StyledTableCell>
                 <StyledTableCell align="left">{row?.phoneno}</StyledTableCell>
                 <StyledTableCell align="left">{row?.role}</StyledTableCell>
                 <StyledTableCell align="left">
                   {row?.permission}
                 </StyledTableCell>
-                <StyledTableCell align="left">Edit {i}</StyledTableCell>
+                <StyledTableCell align="left">
+                  <NavLink
+                    to={{ pathname: "/auth/updateuser", search: row.username }}
+                  >
+                    <EditNoteIcon />
+                  </NavLink>
+                </StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>

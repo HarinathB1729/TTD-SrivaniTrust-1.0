@@ -6,10 +6,10 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import { Button } from "@mui/material";
 import DOMPurify from "dompurify";
 import api from "../api";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Authorized/AuthProvider";
 
 function LoginForm() {
-  const [error, setError] = useState(false);
   const [errMsg, setErrMsg] = useState(false);
   const [captchaVal, setCaptchaVal] = useState("");
   const loginData_init_values = {
@@ -19,8 +19,13 @@ function LoginForm() {
   const [loginData, setLoginData] = useState(loginData_init_values);
   const [userCaptchaValue, setUserCaptchaValue] = useState("");
 
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useAuth();
+
   useEffect(() => {
+    setLoginData(loginData_init_values);
     captchaGenerator();
+    setUserCaptchaValue("");
   }, []);
 
   const btnStyles = {
@@ -69,19 +74,27 @@ function LoginForm() {
 
   const formDataHandler = (e) => {
     e.preventDefault();
-    try {
-      api.post("authentication",loginData)
-        .then((res) => {
-          console.log("response", res);
-        })
-        .catch((err) => {
-          console.log("Error :", err);
+
+    api
+      .post("users/authentication/", loginData)
+      .then((res) => {
+        // console.log("response", res);
+
+        setIsAuthenticated({
+          token: res.data["access_token"],
+          email: res.data["email"],
+          username: res.data["username"],
+          role: res.data["role"],
+          expires_at: res.data["expires_at"],
         });
-    } catch (err) {
-      console.log("Error :", err);
-    }
+        navigate("/auth/");
+      })
+      .catch((err) => {
+        console.log("Error :", err);
+        setErrMsg(err.response.data["detail"]);
+      });
   };
-  console.log("logindata", loginData);
+  // console.log("logindata", loginData);
   // console.log("capval", captchaVal);
   // console.log("usercapval", userCaptchaValue);
 
@@ -97,7 +110,7 @@ function LoginForm() {
     >
       <Container>
         <h2 style={{ color: "#7C0A02" }}>Login</h2>
-        <form onSubmit={formDataHandler} autoComplete="off">
+        <form name="login_form" onSubmit={formDataHandler} autoComplete="off">
           <TextField
             sx={{ margin: "10px 0" }}
             required={true}
@@ -108,7 +121,6 @@ function LoginForm() {
             type="text"
             onChange={loginDataHandler}
             value={loginData?.username}
-            error={error}
           />
           <TextField
             sx={{ margin: "10px 0" }}
@@ -120,7 +132,6 @@ function LoginForm() {
             onChange={loginDataHandler}
             placeholder="Enter Your Password"
             value={loginData?.password}
-            error={error}
           />
 
           <div
@@ -164,21 +175,18 @@ function LoginForm() {
               onChange={captchaDataHandler}
               value={userCaptchaValue}
               placeholder="Captcha Value"
-              error={error}
             />
           </div>
-          {error && (
-            <Typography
-              sx={{ float: "left", color: "red", marginBottom: "20px" }}
-              fontSize={13}
-            >
+
+          {errMsg && (
+            <Typography sx={{ color: "red" }} fontSize={13}>
               {errMsg}
             </Typography>
           )}
 
           <div
             style={{
-              marginTop: "40px",
+              marginTop: "20px",
               display: "flex",
               justifyContent: "space-evenly",
             }}

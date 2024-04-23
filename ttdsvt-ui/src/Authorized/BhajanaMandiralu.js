@@ -1,53 +1,62 @@
-import { Button, Container, FormControl, Grid } from "@mui/material";
+import { Button, Container, Grid } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import BMColumnOne from "./BMColumnOne";
 import BMColumnTwo from "./BMColumnTwo";
 import BMColumnThree from "./BMColumnThree";
+import api from "../api";
+import { useAuth } from "./AuthProvider";
 
 function BhajanaMandiralu() {
+  const { isAuthenticated } = useAuth();
+  const token = isAuthenticated["token"];
   const bmData_init_values = {
     district: "",
-    villagename:"",
-    longitude:"",
-    applicantname:"",
-    phoneno:"",
-    'landtitle-with':"",
-    donorconsent:"",    
-    othertemples:"",
-    "amount-by-locals":"",
-    "contactperson-particulars":"",
-    "other-relevant-issues":"",
-    "temple-history":"",
-    "footfall-of-temple":"",
-    "proposal-for-construction":"",
-    assemblyname:"",
-    colonyname:"",
-    villagepopulation:"",
-    templename:"",
-    // documents:"", it is a filename
-    surveyno:"",
-    "fin-support-ttd":"",
-    nearbytempledetails:"",
-    localscontribution:"",
-    "contactperson-phoneno":"",
-    addlcomments:"",
-    templeage:"",
-    deityname:"",
-    "proposed-work-details":"",
+    villagename: "",
+    longitude: "",
+    applicantname: "",
+    phoneno: "",
+    landtitlewith: "",
+    donorconsent: "",
+    othertemples: "",
+    amountbylocals: "",
+    contactpersonparticulars: "",
+    otherrelevantissues: "",
+    templehistory: "",
+    footfalloftemple: "",
+    proposalforconstruction: "",
+    assemblyname: "",
+    colonyname: "",
+    villagepopulation: "",
+    templename: "",
+    file: "",
+    surveyno: "",
+    finsupportttd: "",
+    nearbytempledetails: "",
+    localscontribution: "",
+    contactpersonphoneno: "",
+    addlcomments: "",
+    templeage: "",
+    deityname: "",
+    proposedworkdetails: "",
     mandal: "",
-    latitude:"",
-    "location-belongs-scstfisherman":"",
-    email:"",
-    landextent:"",
-    boundaries:"",
-    "any-earlier-temple":"",
-    villagedetails:"",
-    "contactperson-email":"",
-    "recommendations-ins_off":"",
-    "annualincome-temple":"",
-    "category-temple":"",
+    latitude: "",
+    locationbelongsscstfisherman: "",
+    email: "",
+    landextent: "",
+    boundaries: "",
+    anyearliertemple: "",
+    villagedetails: "",
+    contactpersonemail: "",
+    recommendationsinsoff: "",
+    annualincometemple: "",
+    categorytemple: "",
+    startdate: new Date().toISOString().split("T")[0],
   };
   const [bmData, setBmData] = useState(bmData_init_values);
+  const [bmdataResponseError, setBmdataResponseError] = useState({});
+  const [file, setFile] = useState({});
+  const navigate = useNavigate();
 
   const clearDataHandler = (e) => {
     e.preventDefault();
@@ -56,8 +65,34 @@ function BhajanaMandiralu() {
 
   const formSubmitHandler = (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("file", file);
+
+    for (const key in bmData) {
+      if (bmData.hasOwnProperty(key)) {
+        formData.append(key, bmData[key]);
+      }
+    }
+
+    api
+      .post("users/bmdata/", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        // console.log("response", res);
+        window.alert(res.data["message"]);
+        navigate("/auth/");
+      })
+      .catch((err) => {
+        console.log("Error :", err);
+        setBmdataResponseError(err.response.data);
+      });
   };
-  console.log("bmdata", bmData);
+  // console.log("bmdata", bmData);
+  // console.log("bmdataResponse Error", bmdataResponseError);
 
   return (
     <>
@@ -70,7 +105,7 @@ function BhajanaMandiralu() {
           minHeight: "58vh",
         }}
       >
-        <form onSubmit={formSubmitHandler} autoComplete="off">
+        <form name="bm_form" onSubmit={formSubmitHandler} autoComplete="off">
           <Grid
             style={{
               width: "100%",
@@ -78,9 +113,22 @@ function BhajanaMandiralu() {
             }}
             container
           >
-            <BMColumnOne setBmData={setBmData} />
-            <BMColumnTwo setBmData={setBmData} />
-            <BMColumnThree setBmData={setBmData} />
+            <BMColumnOne
+              bmdataResponseError={bmdataResponseError}
+              bmData={bmData}
+              setBmData={setBmData}
+            />
+            <BMColumnTwo
+              bmdataResponseError={bmdataResponseError}
+              bmData={bmData}
+              setBmData={setBmData}
+              setFile={setFile}
+            />
+            <BMColumnThree
+              bmdataResponseError={bmdataResponseError}
+              bmData={bmData}
+              setBmData={setBmData}
+            />
 
             <Grid
               item

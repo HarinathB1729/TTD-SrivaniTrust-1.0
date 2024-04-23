@@ -1,13 +1,9 @@
 import React, { useState } from "react";
 import gold from "../Images/gold.jpg";
 import gopuram from "../Images/gopuram.jpg";
-import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
 import LoginForm from "./LoginForm";
 import Footer from "./Footer";
-
-
 
 function Login() {
   return (
@@ -42,9 +38,7 @@ function Login() {
               backgroundSize: "cover", // Optional: Adjust to your desired size
               backgroundRepeat: "no-repeat", // Optional: Adjust as needed}}}>
             }}
-          >
-            
-          </div>
+          ></div>
           <LoginForm />
         </Container>
       </div>

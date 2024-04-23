@@ -1,5 +1,5 @@
 import { Box, Button, Container } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "../App.css";
 import TTDLogo from "../Images/TTDLogo.png";
 import { NavLink } from "react-router-dom";
@@ -7,8 +7,11 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { useAuth } from "./AuthProvider";
 
 function Header() {
+  const { setIsAuthenticated } = useAuth();
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
@@ -33,7 +36,10 @@ function Header() {
   };
 
   const logoutHandler = () => {
-    console.log("logout handler");
+    // console.log("logout handler");
+    setIsAuthenticated({
+      token: false,
+    });
   };
 
   return (
@@ -51,7 +57,7 @@ function Header() {
       }}
     >
       <Box className="center" style={{ width: "10%", height: "100%" }}>
-        <NavLink to="/" onClick={() => handleButtonClick(0)}>
+        <NavLink to="/auth/" onClick={() => handleButtonClick(0)}>
           <img
             style={{ width: "70%", height: "80%" }}
             src={TTDLogo}
@@ -60,7 +66,7 @@ function Header() {
         </NavLink>
       </Box>
       <Box sx={{ width: "80%", display: "flex", gap: "50px" }}>
-        <NavLink to="/bhajanamandiralu">
+        <NavLink to="/auth/bhajanamandiralu">
           <Button
             style={
               activeButton === 1
@@ -78,7 +84,7 @@ function Header() {
             Bhajana Mandiralu
           </Button>
         </NavLink>
-        <NavLink to="/users">
+        <NavLink to="/auth/users">
           <Button
             style={
               activeButton === 2
@@ -96,7 +102,7 @@ function Header() {
             Users
           </Button>
         </NavLink>
-        <NavLink to="/reports">
+        <NavLink to="/auth/reports">
           <Button
             style={
               activeButton === 3
@@ -143,20 +149,20 @@ function Header() {
         >
           <NavLink
             style={{ textDecoration: "none" }}
-            to="/profile"
+            to="/auth/profile"
             onClick={() => handleButtonClick(0)}
           >
             <MenuItem onClick={handleClose}>Profile</MenuItem>
           </NavLink>
           <NavLink
             style={{ textDecoration: "none" }}
-            to="/changepwd"
+            to="/auth/changepwd"
             onClick={() => handleButtonClick(0)}
           >
             <MenuItem onClick={handleClose}>Change Password</MenuItem>
           </NavLink>
         </Menu>
-        <NavLink to="/login">
+        <NavLink to="/">
           <LogoutIcon onClick={logoutHandler} style={{ fill: "black" }} />
         </NavLink>
       </Box>

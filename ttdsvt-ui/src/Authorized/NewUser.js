@@ -1,17 +1,38 @@
-import { Box, Container, FormControl, InputLabel } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import { Box, Container } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import DOMPurify from "dompurify";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { Typography } from "@mui/material";
+import api from "../api";
+import { useAuth } from "./AuthProvider";
 
-const textBoxStyles = { backgroundColor:'white', width: "100%", marginBottom: "10px" }
+const textBoxStyles = {
+  backgroundColor: "white",
+  width: "100%",
+  marginBottom: "10px",
+};
+
+function validatePassword(password) {
+  const regex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{8,20}$/;
+  return regex.test(password);
+}
 
 function NewUser() {
-  const [error, setError] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  const { isAuthenticated } = useAuth();
+  const token = isAuthenticated["token"];
+  const [usernameError, setUsernameError] = useState({
+    error: false,
+    message: "",
+  });
+  const [emailError, setEmailError] = useState({
+    error: false,
+    message: "",
+  });
   const newUser_init_values = {
     email: "",
     username: "",
@@ -20,14 +41,46 @@ function NewUser() {
     phoneno: "",
   };
   const [newUser, setNewUser] = useState(newUser_init_values);
+  const [pwdErr, setPwdErr] = useState(false);
   const [cnfPwd, setCnfPwd] = useState("");
+  const navigate = useNavigate();
 
   const clearDataHandler = (e) => {
     e.preventDefault();
     setNewUser(newUser_init_values);
+    setEmailError({
+      error: false,
+      message: "",
+    });
+    setUsernameError({
+      error: false,
+      message: "",
+    });
+  };
+
+  const checkingValidation = (password) => {
+    if (validatePassword(password)) setPwdErr(false);
+    else setPwdErr(true);
   };
 
   const dataHandler = (e) => {
+    if (e.target.name === "password") {
+      checkingValidation(e.target.value);
+    }
+    if (e.target.name === "phoneno") {
+      if (isNaN(e.target.value)) return;
+    }
+
+    setEmailError({
+      error: false,
+      message: "",
+    });
+
+    setUsernameError({
+      error: false,
+      message: "",
+    });
+
     const sanitized_name = DOMPurify.sanitize(e.target.name);
     const sanitized_value = DOMPurify.sanitize(e.target.value);
 
@@ -39,8 +92,37 @@ function NewUser() {
 
   const formSubmitHandler = (e) => {
     e.preventDefault();
+
+    api
+      .post("users/register/", newUser, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        // console.log("response", res);
+        window.alert(res.data["message"]);
+        navigate("/auth/users");
+      })
+      .catch((err) => {
+        console.log("Error :", err);
+
+        if (err.response.data.email)
+          setEmailError({
+            error: true,
+            message: err.response.data.email[0],
+          });
+        if (err.response.data.username)
+          setUsernameError({
+            error: true,
+            message: err.response.data.username[0],
+          });
+      });
+    setNewUser((prev) => ({ ...prev, password: "" }));
+    setCnfPwd("");
   };
-  //   console.log("newuser",newUser)
+  // console.log("newuser", newUser);
+  // console.log("cnfpwd", cnfPwd);
 
   return (
     <>
@@ -49,7 +131,10 @@ function NewUser() {
       </div>
       <Container sx={{ width: "65vw", minHeight: "58vh" }}>
         <form onSubmit={formSubmitHandler} autoComplete="off">
-          <Grid style={{ border:'1px solid grey', width: "98%", margin: "10px" }} container>
+          <Grid
+            style={{ border: "1px solid grey", width: "98%", margin: "10px" }}
+            container
+          >
             <Grid item xs={6}>
               <Box style={{ textAlign: "left", padding: "10px 20px" }}>
                 <br />
@@ -62,15 +147,15 @@ function NewUser() {
                   label="Username"
                   onChange={dataHandler}
                   value={newUser?.username}
-                  inputProps={{ maxLength: 7 }}
-                  error={error}
+                  error={usernameError.error}
                 />
-                {error && (
+                <br />
+                {usernameError.error && (
                   <Typography sx={{ color: "red", fontSize: "0.8em" }}>
-                    {errMsg}
+                    {usernameError.message}
                   </Typography>
                 )}
-                <br />
+
                 <br />
                 <TextField
                   style={textBoxStyles}
@@ -82,10 +167,15 @@ function NewUser() {
                   label="Password"
                   onChange={dataHandler}
                   value={newUser?.password}
-                  inputProps={{ maxLength: 7 }}
-                  error={error}
                 />
                 <br />
+                {pwdErr && (
+                  <Typography
+                    sx={{ textAlign: "left", color: "red", fontSize: "0.8em" }}
+                  >
+                    Password didn't meet the requirements.
+                  </Typography>
+                )}
 
                 <br />
                 <TextField
@@ -95,11 +185,9 @@ function NewUser() {
                   placeholder="Phone Number"
                   variant="outlined"
                   label="Phone Number"
-                  //   type="number"
                   onChange={dataHandler}
                   value={newUser?.phoneno}
                   inputProps={{ maxLength: 10 }}
-                  error={error}
                 />
               </Box>
             </Grid>
@@ -117,29 +205,34 @@ function NewUser() {
                   variant="outlined"
                   onChange={dataHandler}
                 />
-                <br /> <br />
+                <br />
+                {emailError.error && (
+                  <Typography sx={{ color: "red", fontSize: "0.8em" }}>
+                    {emailError.message}
+                  </Typography>
+                )}
+                <br />
                 <TextField
                   style={textBoxStyles}
                   required
                   name="cnfpwd"
                   type="password"
                   label="Confirm Password"
+                  value={cnfPwd}
                   onChange={(e) => {
                     setCnfPwd(e.target.value);
                   }}
                   placeholder="Confirm Password"
                   error={cnfPwd !== newUser.password}
                 />
+                <br />
                 {cnfPwd !== newUser.password && (
                   <Typography
-                    sx={{ float: "left", color: "red" }}
-                    fontSize={13}
-                    gutterBottom
+                    sx={{ textAlign: "left", color: "red", fontSize: "0.8em" }}
                   >
                     Passwords don't match
                   </Typography>
                 )}
-                <br />
                 <br />
                 <TextField
                   style={textBoxStyles}
@@ -151,28 +244,38 @@ function NewUser() {
                   onChange={dataHandler}
                   defaultValue={"User"}
                 >
-                  <MenuItem value={"User"}>User</MenuItem>
-                  <MenuItem value={"Admin"}>Admin</MenuItem>
+                  <MenuItem value={"user"}>user</MenuItem>
+                  <MenuItem value={"admin"}>admin</MenuItem>
                 </TextField>
               </Box>
             </Grid>
             <br />
             <br />
             <Grid
+              item
               xs={12}
               className="center"
               style={{ margin: "20px", gap: "50px" }}
             >
               <Button
-                style={{ width: "100px" }}
+                style={{ width: "200px" }}
                 variant="contained"
                 type="submit"
+                disabled={
+                  !newUser.email ||
+                  !newUser.password ||
+                  !newUser.phoneno ||
+                  !newUser.username ||
+                  !newUser.role ||
+                  !cnfPwd ||
+                  newUser.password !== cnfPwd
+                }
               >
-                Update
+                Create User
               </Button>
 
               <Button
-                style={{ width: "100px" }}
+                style={{ width: "200px" }}
                 variant="contained"
                 color="error"
                 onClick={clearDataHandler}

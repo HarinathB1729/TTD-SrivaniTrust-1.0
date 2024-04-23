@@ -1,17 +1,9 @@
 import React from "react";
+import PropTypes from "prop-types";
 import DOMPurify from "dompurify";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
-import {
-  Box,
-  Checkbox,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Box, MenuItem } from "@mui/material";
 
 const textBoxStyles = {
   backgroundColor: "white",
@@ -31,22 +23,26 @@ const MenuProps = {
 };
 
 const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder",
+  "Anantapur",
+  "Chittoor",
+  "East Godavari",
+  "Guntur",
+  "Krishna",
+  "Kurnool",
+  "Prakasam",
+  "Sri Potti Sriramulu Nellore",
+  "Srikakulam",
+  "Visakhapatnam",
+  "Vizianagaram",
+  "West Godavari",
+  "YSR Kadapa",
 ];
 
-
 function BMColumnOne(props) {
-  
   const dataHandler = (e) => {
+    if (e.target.name === "phoneno") {
+      if (isNaN(e.target.value)) return;
+    }
     const sanitized_name = DOMPurify.sanitize(e.target.name);
     const sanitized_value = DOMPurify.sanitize(e.target.value);
 
@@ -54,18 +50,6 @@ function BMColumnOne(props) {
       ...prev,
       [sanitized_name]: sanitized_value,
     }));
-  };
-  const [personName, setPersonName] = React.useState([]);
-
-
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
   };
 
   return (
@@ -78,21 +62,19 @@ function BMColumnOne(props) {
           style={textBoxStyles}
           select
           name="district"
-          label="Name of the District"
+          label="Name of the District *"
           placeholder="Name of the District"
           SelectProps={{
-            multiple: true,
-            value: personName,
-            onChange: handleChange,
-            renderValue: (selected) => selected.join(", "),
+            value: props.bmData?.district || "",
+            onChange: dataHandler,
+            renderValue: (selected) => selected,
             MenuProps: MenuProps,
-          }}        
+          }}
           variant="outlined"
         >
           {names.map((name) => (
             <MenuItem key={name} value={name}>
-              <Checkbox checked={personName.indexOf(name) > -1} />
-              <ListItemText primary={name} />
+              {name}
             </MenuItem>
           ))}
         </TextField>
@@ -102,11 +84,13 @@ function BMColumnOne(props) {
         <TextField
           style={textBoxStyles}
           required
-          name="Name of the Village"
+          name="villagename"
           placeholder="Name of the Village"
           label="villagename"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.villagename}
+          error={props.bmdataResponseError?.villagename}
         />
         <br />
         <br />
@@ -118,6 +102,8 @@ function BMColumnOne(props) {
           label="Longitude of the location"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.longitude}
+          error={props.bmdataResponseError?.longitude}
         />
         <br />
         <br />
@@ -129,6 +115,8 @@ function BMColumnOne(props) {
           label="Name of individual/Temple etc., who made the request"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.applicantname}
+          error={props.bmdataResponseError?.applicantname}
         />
         <br />
         <br />
@@ -136,25 +124,28 @@ function BMColumnOne(props) {
           style={textBoxStyles}
           required
           name="phoneno"
-          // type="number"
           inputProps={{
-            maxLength:10
+            maxLength: 10,
           }}
           placeholder="Phone number"
           label="Phone number"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.phoneno}
+          error={props.bmdataResponseError?.phoneno}
         />
         <br />
-        <br /> 
+        <br />
         <TextField
           style={textBoxStyles}
           required
-          name="landtitle-with"
+          name="landtitlewith"
           placeholder="Title of the land vests with ( Name of the individual/Govt./Temple etc.)"
           label="Title of the land vests ( Name of the individual/Govt./Temple etc.)"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.landtitlewith}
+          error={props.bmdataResponseError?.landtitlewith}
         />
         <br />
         <br />
@@ -166,6 +157,8 @@ function BMColumnOne(props) {
           label="Consent given for donating the land in favour of New Temple"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.donorconsent}
+          error={props.bmdataResponseError?.donorconsent}
         />
         <br />
         <br />
@@ -177,114 +170,107 @@ function BMColumnOne(props) {
           label="Details of other temples available in the vicinity"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.othertemples}
+          error={props.bmdataResponseError?.othertemples}
         />
         <br />
-        <br /> 
-       
+        <br />
+
         <TextField
           style={textBoxStyles}
           required
-          name="amount-by-locals"
+          name="amountbylocals"
+          type="number"
+          inputProps={{
+            min: 0,
+          }}
           placeholder="Amount in Rs. Proposed to be contribute by the locals if any"
           label="Amount in Rs. Proposed to be contribute by the locals if any"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.amountbylocals}
+          error={props.bmdataResponseError?.amountbylocals}
         />
         <br />
         <br />
         <TextField
           style={textBoxStyles}
           required
-          name="contactperson-particulars"
+          name="contactpersonparticulars"
           placeholder="Particulars of the contact person"
           label="Particulars of the contact person"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.contactpersonparticulars}
+          error={props.bmdataResponseError?.contactpersonparticulars}
         />
         <br />
-        <br /> 
+        <br />
         <TextField
           style={textBoxStyles}
           required
-          name="other-relevant-issues"
+          name="otherrelevantissues"
           placeholder="Other relevant issues, if any"
           label="Other relevant issues, if any"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.otherrelevantissues}
+          error={props.bmdataResponseError?.otherrelevantissues}
         />
         <br />
         <br />
         <TextField
           style={textBoxStyles}
           required
-          name="temple-history"
+          name="templehistory"
           placeholder="History/Importance/Sthalapuram of the temple proposed"
           label="History/Importance/Sthalapuram of the temple proposed"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.templehistory}
+          error={props.bmdataResponseError?.templehistory}
         />
         <br />
         <br />
         <TextField
           style={textBoxStyles}
           required
-          name="footfall-of-temple"
+          name="footfalloftemple"
+          type="number"
+          inputProps={{
+            min: 0,
+          }}
           placeholder="Footfall of temple(On normal days,Weekends,Special occasions)"
           label="Footfall of temple(On normal days,Weekends,Special occasions)"
           variant="outlined"
           onChange={dataHandler}
+          value={props.bmData?.footfalloftemple}
+          error={props.bmdataResponseError?.footfalloftemple}
         />
         <br />
         <br />
         <TextField
           style={textBoxStyles}
           required
-          name="proposal-for-construction"
+          name="proposalforconstruction"
           placeholder="Proposed for Renovation/Re-construction/New Construction"
           label="Proposed for Renovation/Re-construction/New Construction"
           variant="outlined"
           onChange={dataHandler}
-        />
-        <br />
-        <br /> 
-        {/* 
-        <TextField
-          style={textBoxStyles}
-          required
-          name=""
-          placeholder=""
-          label=""
-          variant="outlined"
-          onChange={dataHandler}
+          value={props.bmData?.proposalforconstruction}
+          error={props.bmdataResponseError?.proposalforconstruction}
         />
         <br />
         <br />
-        <TextField
-          style={textBoxStyles}
-          required
-          name=""
-          placeholder=""
-          label=""
-          variant="outlined"
-          onChange={dataHandler}
-        />
-        <br />
-        <br />
-        <TextField
-          style={textBoxStyles}
-          required
-          name=""
-          placeholder=""
-          label=""
-          variant="outlined"
-          onChange={dataHandler}
-        />
-        <br />
-        <br /> 
-        */}
       </Box>
     </Grid>
   );
 }
+
+BMColumnOne.propTypes = {
+  bmData: PropTypes.object.isRequired,
+  setBmData: PropTypes.func.isRequired,
+  bmdataResponseError: PropTypes.object.isRequired,
+};
 
 export default BMColumnOne;

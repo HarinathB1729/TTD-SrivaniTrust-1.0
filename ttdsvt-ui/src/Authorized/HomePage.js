@@ -11,7 +11,7 @@ function HomePage() {
         sx={{
           textAlign: "justify",
           border: "1px solid black",
-          padding:'20px',
+          padding: "20px",
           minHeight: "58vh",
         }}
       >
@@ -58,7 +58,7 @@ function HomePage() {
           perform religious rituals, functions and festivals and also renovate,
           protect, preserve and maintain Gopurams and archaeological buildings
           temples in every village and in every town for universal welfare which
-          reflect the glory of Indian Culture, Tradition and History . 
+          reflect the glory of Indian Culture, Tradition and History .
         </div>
       </Container>
     </>

@@ -6,14 +6,14 @@ export const AuthContext = createContext();
 // AuthProvider component to manage authentication state
 export const AuthProvider = ({ children }) => {
   // State to hold authentication status
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Memoize the context value object to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({ isAuthenticated, setIsAuthenticated }),
     [isAuthenticated]
   );
-  // console.log("isAutenticated", isAuthenticated);
+  // console.log("isAutenticated", isAuthenticated);/
 
   return (
     // Provide the authentication state and functions to children components
