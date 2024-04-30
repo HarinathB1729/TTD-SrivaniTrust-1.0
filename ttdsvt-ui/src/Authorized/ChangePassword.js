@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import DOMPurify from "dompurify";
-import api from "../api";
+import { changePasswordApiCall } from "../api";
 
 function validatePassword(password) {
   const regex =
@@ -11,11 +11,10 @@ function validatePassword(password) {
   return regex.test(password);
 }
 
-function ChangePassword() {
+function ChangePassword(props) {
   const [pwdErr, setPwdErr] = useState(false);
   const [cnfPwd, setCnfPwd] = useState("");
   const { isAuthenticated } = useAuth();
-  const token = isAuthenticated["token"];
   const [userCredentials, setUserCredentials] = useState({
     email: isAuthenticated["email"],
     password: "",
@@ -45,24 +44,20 @@ function ChangePassword() {
   const formDataHandler = (e) => {
     e.preventDefault();
 
-    api
-      .patch("users/changepwd/", userCredentials, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    changePasswordApiCall(userCredentials,props.token)
       .then((res) => {
-        console.log("response", res);
+        // console.log("response", res);
         window.alert(res.data["message"]);
         navigate("/auth/");
       })
       .catch((err) => {
+        if(err.response.status==401) navigate("/")
         console.log("Error :", err);
       });
   };
 
-  console.log("userCredentials", userCredentials);
-  console.log("cnfpwd", cnfPwd);
+  // console.log("userCredentials", userCredentials);
+  // console.log("cnfpwd", cnfPwd);
 
   return (
     <>

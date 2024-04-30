@@ -4,12 +4,9 @@ import React, { useState } from "react";
 import BMColumnOne from "./BMColumnOne";
 import BMColumnTwo from "./BMColumnTwo";
 import BMColumnThree from "./BMColumnThree";
-import api from "../api";
-import { useAuth } from "./AuthProvider";
+import { bhajanaMandiraluApiCall } from "../api";
 
-function BhajanaMandiralu() {
-  const { isAuthenticated } = useAuth();
-  const token = isAuthenticated["token"];
+function BhajanaMandiralu(props) {
   const bmData_init_values = {
     district: "",
     villagename: "",
@@ -74,19 +71,13 @@ function BhajanaMandiralu() {
       }
     }
 
-    api
-      .post("users/bmdata/", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((res) => {
-        // console.log("response", res);
-        window.alert(res.data["message"]);
+    bhajanaMandiraluApiCall(formData,props.token)
+      .then((data) => {
+        window.alert(data["message"]);
         navigate("/auth/");
       })
       .catch((err) => {
+        if(err.response.status==401) navigate("/")
         console.log("Error :", err);
         setBmdataResponseError(err.response.data);
       });

@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import api from "../api";
+import { fetchUserApiCall, updateUserApiCall } from "../api";
 import { useAuth } from "./AuthProvider";
 
 const textBoxStyles = {
@@ -15,9 +15,8 @@ const textBoxStyles = {
   marginBottom: "10px",
 };
 
-function UpdateUser() {
-  const { isAuthenticated } = useAuth();
-  const token = isAuthenticated["token"];
+function UpdateUser(props) {
+  const {isAuthenticated} = useAuth();
   const [newUser, setNewUser] = useState({
     email: "",
     phoneno: "",
@@ -27,26 +26,24 @@ function UpdateUser() {
   let location = useLocation();
   const navigate = useNavigate();
   const [changeInData, setChangeInData] = useState(false);
+  const name = location.search.slice(1);
+  // console.log("name",name)
 
   useEffect(() => {
-    const name = location.search.slice(1);
+    
     const fetchUserData = async () => {
-      api
-        .get("users/user/" + name + "/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          //   console.log("response", res);
-          setNewUser(res.data);
+      fetchUserApiCall(name,isAuthenticated.token)
+        .then((data) => {
+            // console.log("response", data);
+          setNewUser(data);
         })
         .catch((err) => {
+          if(err.response.status==401) navigate("/")
           console.log("Error :", err);
         });
     };
     fetchUserData();
-  }, [location]);
+  }, [name]);
 
   const dataHandler = (e) => {
     if (e.target.name === "phoneno") {
@@ -66,18 +63,14 @@ function UpdateUser() {
   const formSubmitHandler = (e) => {
     e.preventDefault();
 
-    api
-      .patch("users/user/" + newUser.username + "/", newUser, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
+    updateUserApiCall(newUser,props.token)
+      .then((data) => {
         // console.log("response", res);
-        window.alert(res.data["message"]);
+        window.alert(data["message"]);
         navigate("/auth/users");
       })
       .catch((err) => {
+        if(err.response.status==401) navigate("/")
         console.log("Error :", err);
       });
   };

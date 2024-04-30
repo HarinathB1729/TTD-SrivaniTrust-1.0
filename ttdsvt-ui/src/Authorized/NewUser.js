@@ -7,8 +7,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { Typography } from "@mui/material";
-import api from "../api";
-import { useAuth } from "./AuthProvider";
+import { newUserApiCall } from "../api";
 
 const textBoxStyles = {
   backgroundColor: "white",
@@ -22,9 +21,7 @@ function validatePassword(password) {
   return regex.test(password);
 }
 
-function NewUser() {
-  const { isAuthenticated } = useAuth();
-  const token = isAuthenticated["token"];
+function NewUser(props) {
   const [usernameError, setUsernameError] = useState({
     error: false,
     message: "",
@@ -93,20 +90,15 @@ function NewUser() {
   const formSubmitHandler = (e) => {
     e.preventDefault();
 
-    api
-      .post("users/register/", newUser, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
+    newUserApiCall(newUser,props.token)
+      .then((data) => {
         // console.log("response", res);
-        window.alert(res.data["message"]);
+        window.alert(data["message"]);
         navigate("/auth/users");
       })
       .catch((err) => {
-        console.log("Error :", err);
-
+        // console.log("Error :", err);
+        if(err.response.status==401) navigate("/")
         if (err.response.data.email)
           setEmailError({
             error: true,
@@ -117,6 +109,8 @@ function NewUser() {
             error: true,
             message: err.response.data.username[0],
           });
+
+        if(err.response.status==401) navigate("/")
       });
     setNewUser((prev) => ({ ...prev, password: "" }));
     setCnfPwd("");

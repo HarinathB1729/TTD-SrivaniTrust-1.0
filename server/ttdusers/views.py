@@ -5,11 +5,12 @@ from .models import UserModel, BhajanaMandiraluModel
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
   
 # Create your views here.
@@ -183,6 +184,10 @@ def user_list_view(request, name):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def bmdata_view(request):    
+        """
+        Token Checking and Uploading Bhajana Mandiralu Data to Database
+        """
+
         # print("request data",request.data)
         file_obj = request.FILES.get('file')
 
@@ -198,14 +203,15 @@ def bmdata_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def reports_view(request):    
+        """
+        Token Checking and fetching Reports
+        """
         # print("reports_view",request.data)
         district = request.data.get('district')  
         mandal = request.data.get('mandal')        
         colony = request.data.get('colony')   
 
-
-        try:
-            
+        try:            
             # Start with a base queryset filtered by district
             query = BhajanaMandiraluModel.objects.filter(district=district)
 
@@ -224,6 +230,4 @@ def reports_view(request):
         except BhajanaMandiraluModel.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-           
-
 

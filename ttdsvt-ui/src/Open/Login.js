@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import gold from "../Images/gold.jpg";
 import gopuram from "../Images/gopuram.jpg";
 import Container from "@mui/material/Container";

@@ -1,12 +1,11 @@
 import { Container, TextField, Typography, Button } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api";
 import { useAuth } from "./AuthProvider";
+import { userUpdateApiCall } from "../api";
 
-function Profile() {
+function Profile(props) {
   const { isAuthenticated } = useAuth();
-  const token = isAuthenticated["token"];
   const [edit, setEdit] = useState(true);
   const [changeInData, setChangeInData] = useState(false);
   const navigate = useNavigate();
@@ -43,19 +42,15 @@ function Profile() {
   const formSubmitHandler = (e) => {
     e.preventDefault();
 
-    api
-      .patch("users/usernameupdate/", profileData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
+    userUpdateApiCall(profileData,props.token)
+      .then((data) => {
         // console.log("response", res);
-        window.alert(res.data["message"]);
+        window.alert(data["message"]);
         navigate("/");
       })
       .catch((err) => {
         // console.log("Error :", err);
+        if(err.response.status==401) navigate("/")
         setChangeInData(false);
         if (err.response.data.username)
           setUsernameError({

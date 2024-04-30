@@ -13,6 +13,7 @@ import { Box, Button } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { NavLink } from "react-router-dom";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import UpdateUser from "./UpdateUser";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -110,6 +111,7 @@ export default function UsersData(props) {
                     <EditNoteIcon />
                   </NavLink>
                 </StyledTableCell>
+             
               </StyledTableRow>
             ))}
           </TableBody>

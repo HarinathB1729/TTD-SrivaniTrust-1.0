@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     () => ({ isAuthenticated, setIsAuthenticated }),
     [isAuthenticated]
   );
-  // console.log("isAutenticated", isAuthenticated);/
+  // console.log("isAutenticated", isAuthenticated);
 
   return (
     // Provide the authentication state and functions to children components

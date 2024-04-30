@@ -37,9 +37,8 @@ function Header() {
 
   const logoutHandler = () => {
     // console.log("logout handler");
-    setIsAuthenticated({
-      token: false,
-    });
+    localStorage.clear()
+    setIsAuthenticated(false);
   };
 
   return (

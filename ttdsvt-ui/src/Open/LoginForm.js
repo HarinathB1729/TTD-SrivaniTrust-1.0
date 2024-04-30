@@ -5,9 +5,9 @@ import TextField from "@mui/material/TextField";
 import ReplayIcon from "@mui/icons-material/Replay";
 import { Button } from "@mui/material";
 import DOMPurify from "dompurify";
-import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authorized/AuthProvider";
+import { loginAuthenticationApiCall } from "../api";
 
 function LoginForm() {
   const [errMsg, setErrMsg] = useState(false);
@@ -16,6 +16,7 @@ function LoginForm() {
     username: "",
     password: "",
   };
+  
   const [loginData, setLoginData] = useState(loginData_init_values);
   const [userCaptchaValue, setUserCaptchaValue] = useState("");
 
@@ -75,17 +76,16 @@ function LoginForm() {
   const formDataHandler = (e) => {
     e.preventDefault();
 
-    api
-      .post("users/authentication/", loginData)
-      .then((res) => {
-        // console.log("response", res);
+    loginAuthenticationApiCall(loginData)
+      .then((data) => {
+        // console.log("response", data);          
 
         setIsAuthenticated({
-          token: res.data["access_token"],
-          email: res.data["email"],
-          username: res.data["username"],
-          role: res.data["role"],
-          expires_at: res.data["expires_at"],
+          token: data["access_token"],
+          email: data["email"],
+          username: data["username"],
+          role: data["role"],
+          expires_at: data["expires_at"],
         });
         navigate("/auth/");
       })

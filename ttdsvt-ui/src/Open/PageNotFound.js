@@ -8,7 +8,7 @@ function PageNotFound() {
         style={{ width: "99vw", height: "99vh" }}
         src={img}
         alt="page not found"
-      ></img>
+      />
     </div>
   );
 }
