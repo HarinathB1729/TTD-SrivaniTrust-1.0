@@ -61,8 +61,9 @@ function BMColumnOne(props) {
         <TextField
           style={textBoxStyles}
           select
+          required
           name="district"
-          label="Name of the District *"
+          label="Name of the District "
           placeholder="Name of the District"
           SelectProps={{
             value: props.bmData?.district || "",

@@ -1,4 +1,4 @@
-import { Box, Container } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import DOMPurify from "dompurify";
@@ -6,8 +6,8 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import { Typography } from "@mui/material";
 import { newUserApiCall } from "../api";
+import { useAuth } from "./AuthProvider";
 
 const textBoxStyles = {
   backgroundColor: "white",
@@ -21,7 +21,10 @@ function validatePassword(password) {
   return regex.test(password);
 }
 
-function NewUser(props) {
+function NewUser() {
+  const { isAuthenticated } = useAuth();
+  const token = isAuthenticated.token;
+
   const [usernameError, setUsernameError] = useState({
     error: false,
     message: "",
@@ -90,7 +93,7 @@ function NewUser(props) {
   const formSubmitHandler = (e) => {
     e.preventDefault();
 
-    newUserApiCall(newUser,props.token)
+    newUserApiCall(newUser, token)
       .then((data) => {
         // console.log("response", res);
         window.alert(data["message"]);
@@ -98,7 +101,7 @@ function NewUser(props) {
       })
       .catch((err) => {
         // console.log("Error :", err);
-        if(err.response.status==401) navigate("/")
+        if (err.response.status == 401) navigate("/");
         if (err.response.data.email)
           setEmailError({
             error: true,
@@ -110,7 +113,7 @@ function NewUser(props) {
             message: err.response.data.username[0],
           });
 
-        if(err.response.status==401) navigate("/")
+        if (err.response.status == 401) navigate("/");
       });
     setNewUser((prev) => ({ ...prev, password: "" }));
     setCnfPwd("");

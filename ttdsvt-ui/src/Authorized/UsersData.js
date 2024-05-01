@@ -13,7 +13,7 @@ import { Box, Button } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { NavLink } from "react-router-dom";
 import EditNoteIcon from "@mui/icons-material/EditNote";
-import UpdateUser from "./UpdateUser";
+import PropTypes from "prop-types";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -38,6 +38,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+// Inside your functional component:
+UsersData.propTypes = {
+  usersData: PropTypes.array.isRequired,
+};
+
 export default function UsersData(props) {
   const [usersData, setUsersData] = useState([]);
   const [page, setPage] = useState(0);
@@ -45,7 +50,7 @@ export default function UsersData(props) {
 
   useEffect(() => {
     setUsersData(props.usersData);
-  }, [props.usersData]);
+  }, [props]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -105,13 +110,10 @@ export default function UsersData(props) {
                   {row?.permission}
                 </StyledTableCell>
                 <StyledTableCell align="left">
-                  <NavLink
-                    to={{ pathname: "/auth/updateuser", search: row.username }}
-                  >
+                  <NavLink to="/auth/updateuser" state={{ name: row.username }}>
                     <EditNoteIcon />
                   </NavLink>
                 </StyledTableCell>
-             
               </StyledTableRow>
             ))}
           </TableBody>

@@ -1,3 +1,4 @@
+import React from "react";
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -5,7 +6,6 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import React from "react";
 import Login from "./Open/Login";
 import Layout from "./Authorized/Layout";
 import BhajanaMandiralu from "./Authorized/BhajanaMandiralu";
@@ -19,7 +19,6 @@ import { useAuth } from "./Authorized/AuthProvider";
 import PageNotFound from "./Open/PageNotFound";
 import UpdateUser from "./Authorized/UpdateUser";
 
-
 function App() {
   const { isAuthenticated } = useAuth();
 
@@ -30,19 +29,19 @@ function App() {
           <Route exact path="/" element={<Login />} />
           <Route
             path="/auth"
-            element={true ? <Layout /> : <Navigate to="/" />}
+            element={isAuthenticated.token ? <Layout /> : <Navigate to="/" />}
           >
             <Route path="/auth/" element={<HomePage />} />
             <Route
               path="/auth/bhajanamandiralu"
-              element={<BhajanaMandiralu token={isAuthenticated.token} />}
+              element={<BhajanaMandiralu />}
             />
-            <Route path="/auth/users" element={<Users token={isAuthenticated.token} />} />
-            <Route path="/auth/reports" element={<Reports token={isAuthenticated.token} />} />
-            <Route path="/auth/profile" element={<Profile token={isAuthenticated.token} />} />
-            <Route path="/auth/newuser" element={<NewUser token={isAuthenticated.token} />} />
-            <Route path="/auth/updateuser" element={<UpdateUser token={isAuthenticated.token} />} />
-            <Route path="/auth/changepwd" element={<ChangePassword token={isAuthenticated.token} />} />
+            <Route path="/auth/users" element={<Users />} />
+            <Route path="/auth/reports" element={<Reports />} />
+            <Route path="/auth/profile" element={<Profile />} />
+            <Route path="/auth/newuser" element={<NewUser />} />
+            <Route path="/auth/updateuser" element={<UpdateUser />} />
+            <Route path="/auth/changepwd" element={<ChangePassword />} />
           </Route>
           <Route path="*" element={<PageNotFound />} />
         </Routes>

@@ -5,4 +5,8 @@ import App from "./App";
 import { AuthProvider } from "./Authorized/AuthProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render( <AuthProvider><App /></AuthProvider>);
+root.render(
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);

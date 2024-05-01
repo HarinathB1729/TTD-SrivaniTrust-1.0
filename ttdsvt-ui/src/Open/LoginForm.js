@@ -16,7 +16,7 @@ function LoginForm() {
     username: "",
     password: "",
   };
-  
+
   const [loginData, setLoginData] = useState(loginData_init_values);
   const [userCaptchaValue, setUserCaptchaValue] = useState("");
 
@@ -78,7 +78,7 @@ function LoginForm() {
 
     loginAuthenticationApiCall(loginData)
       .then((data) => {
-        // console.log("response", data);          
+        // console.log("response", data);
 
         setIsAuthenticated({
           token: data["access_token"],

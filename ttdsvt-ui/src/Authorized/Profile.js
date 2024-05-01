@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import { userUpdateApiCall } from "../api";
 
-function Profile(props) {
+function Profile() {
   const { isAuthenticated } = useAuth();
+  const token = isAuthenticated.token;
   const [edit, setEdit] = useState(true);
   const [changeInData, setChangeInData] = useState(false);
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ function Profile(props) {
   const formSubmitHandler = (e) => {
     e.preventDefault();
 
-    userUpdateApiCall(profileData,props.token)
+    userUpdateApiCall(profileData, token)
       .then((data) => {
         // console.log("response", res);
         window.alert(data["message"]);
@@ -50,7 +51,7 @@ function Profile(props) {
       })
       .catch((err) => {
         // console.log("Error :", err);
-        if(err.response.status==401) navigate("/")
+        if (err.response.status == 401) navigate("/");
         setChangeInData(false);
         if (err.response.data.username)
           setUsernameError({

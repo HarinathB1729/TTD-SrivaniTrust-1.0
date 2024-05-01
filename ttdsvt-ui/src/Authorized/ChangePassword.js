@@ -11,10 +11,11 @@ function validatePassword(password) {
   return regex.test(password);
 }
 
-function ChangePassword(props) {
+function ChangePassword() {
   const [pwdErr, setPwdErr] = useState(false);
   const [cnfPwd, setCnfPwd] = useState("");
   const { isAuthenticated } = useAuth();
+  const token = isAuthenticated.token;
   const [userCredentials, setUserCredentials] = useState({
     email: isAuthenticated["email"],
     password: "",
@@ -44,14 +45,14 @@ function ChangePassword(props) {
   const formDataHandler = (e) => {
     e.preventDefault();
 
-    changePasswordApiCall(userCredentials,props.token)
-      .then((res) => {
-        // console.log("response", res);
-        window.alert(res.data["message"]);
+    changePasswordApiCall(userCredentials, token)
+      .then((data) => {
+        console.log("response", data);
+        window.alert(data["message"]);
         navigate("/auth/");
       })
       .catch((err) => {
-        if(err.response.status==401) navigate("/")
+        if (err.response.status == 401) navigate("/");
         console.log("Error :", err);
       });
   };

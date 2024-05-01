@@ -36,8 +36,7 @@ function Header() {
   };
 
   const logoutHandler = () => {
-    // console.log("logout handler");
-    localStorage.clear()
+    // console.log("logout handler");    
     setIsAuthenticated(false);
   };
 

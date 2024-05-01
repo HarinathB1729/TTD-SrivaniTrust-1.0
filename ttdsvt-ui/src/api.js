@@ -5,10 +5,9 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
 });
 
-
 // API CALL FOR -  GETTING USERS DATA
 export const getUsersApiCall = async (token) => {
-  try {    
+  try {
     const response = await api.get("/users/", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -21,8 +20,6 @@ export const getUsersApiCall = async (token) => {
   }
 };
 
-
-
 // API CALL FOR -  CHECKING USER LOGIN
 export const loginAuthenticationApiCall = async (loginData) => {
   try {
@@ -34,9 +31,8 @@ export const loginAuthenticationApiCall = async (loginData) => {
   }
 };
 
-
 // API CALL FOR -  UPLOADING BHAJANA MANDIRALU DATA
-export const bhajanaMandiraluApiCall = async (formData,token) => {
+export const bhajanaMandiraluApiCall = async (formData, token) => {
   try {
     const response = await api.post("users/bmdata/", formData, {
       headers: {
@@ -52,9 +48,8 @@ export const bhajanaMandiraluApiCall = async (formData,token) => {
   }
 };
 
-
 // API CALL FOR -  REGISTERING NEW USER
-export const newUserApiCall = async (newUser,token) => {
+export const newUserApiCall = async (newUser, token) => {
   try {
     const response = await api.post("users/register/", newUser, {
       headers: {
@@ -69,9 +64,8 @@ export const newUserApiCall = async (newUser,token) => {
   }
 };
 
-
 // API CALL FOR -  USERNAME UPDATE
-export const userUpdateApiCall = async (profileData,token) => {
+export const userUpdateApiCall = async (profileData, token) => {
   try {
     const response = await api.patch("users/usernameupdate/", profileData, {
       headers: {
@@ -86,9 +80,8 @@ export const userUpdateApiCall = async (profileData,token) => {
   }
 };
 
-
 // API CALL FOR -  GENERATING REPORTS
-export const reportsApiCall = async (reports,token) => {
+export const reportsApiCall = async (reports, token) => {
   try {
     const response = await api.post("users/reports/", reports, {
       headers: {
@@ -103,9 +96,8 @@ export const reportsApiCall = async (reports,token) => {
   }
 };
 
-
 // API CALL FOR -  UPDATING USER
-export const updateUserApiCall = async (newUser,token) => {
+export const updateUserApiCall = async (newUser, token) => {
   try {
     const response = await api.patch(
       "users/user/" + newUser.username + "/",
@@ -124,9 +116,8 @@ export const updateUserApiCall = async (newUser,token) => {
   }
 };
 
-
 // API CALL FOR -  FETCHING USER DATA
-export const fetchUserApiCall = async (name,token) => {
+export const fetchUserApiCall = async (name, token) => {
   try {
     const response = await api.get("users/user/" + name + "/", {
       headers: {
@@ -141,9 +132,8 @@ export const fetchUserApiCall = async (name,token) => {
   }
 };
 
-
 // API CALL FOR -  CHANGE PASSWORD
-export const changePasswordApiCall = async (userCredentials,token) => {
+export const changePasswordApiCall = async (userCredentials, token) => {
   try {
     const response = await api.patch("users/changepwd/", userCredentials, {
       headers: {

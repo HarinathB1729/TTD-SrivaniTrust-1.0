@@ -1,12 +1,17 @@
-import { Box, Container, MenuItem } from "@mui/material";
+import {
+  Button,
+  Grid,
+  TextField,
+  Box,
+  Container,
+  MenuItem,
+} from "@mui/material";
 import React, { useState } from "react";
 import DOMPurify from "dompurify";
-import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import PrintIcon from "@mui/icons-material/Print";
 import { reportsApiCall } from "../api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthProvider";
 
 const textBoxStyles = {
   backgroundColor: "white",
@@ -49,7 +54,10 @@ const names = [
   "YSR Kadapa",
 ];
 
-function Reports(props) {
+function Reports() {
+  const { isAuthenticated } = useAuth();
+  const token = isAuthenticated.token;
+
   const navigate = useNavigate();
   const reports_init_values = {
     district: "",
@@ -95,7 +103,7 @@ function Reports(props) {
   const formSubmitHandler = (e) => {
     e.preventDefault();
 
-    reportsApiCall(reports,props.token)
+    reportsApiCall(reports, token)
       .then((data) => {
         // console.log("response", res);
         if (data) {
@@ -103,7 +111,7 @@ function Reports(props) {
         }
       })
       .catch((err) => {
-        if(err.response.status==401) navigate("/")
+        if (err.response.status == 401) navigate("/");
         console.log("Error :", err);
       });
   };

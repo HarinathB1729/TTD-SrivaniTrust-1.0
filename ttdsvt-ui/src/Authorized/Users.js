@@ -6,8 +6,10 @@ import { getUsersApiCall } from "../api"; // Import getUsers directly
 import { useAuth } from "./AuthProvider";
 import { useNavigate } from "react-router-dom";
 
-function Users(props) {
+function Users() {
   const { isAuthenticated } = useAuth();
+  const token = isAuthenticated.token;
+
   const navigate = useNavigate();
   const [usersData, setUsersData] = useState([]);
   const isAdmin =
@@ -18,11 +20,11 @@ function Users(props) {
     const fetchUsersData = async () => {
       if (isAdmin) {
         try {
-          const data = await getUsersApiCall(props.token); // Call getUsers directly
+          const data = await getUsersApiCall(token); // Call getUsers directly
           // console.log("data",data)
           setUsersData(data);
         } catch (error) {
-          if(error.response.status==401) navigate("/")
+          if (error.response.status == 401) navigate("/");
           console.log("Error fetching users:", error);
         }
       }
@@ -43,7 +45,7 @@ function Users(props) {
         }}
       >
         {isAuthenticated["role"] === "admin" ? (
-          <UsersData usersData={usersData} token={props.token} />
+          <UsersData usersData={usersData} token={token} />
         ) : (
           "You Don't Have Permission to View This Page"
         )}

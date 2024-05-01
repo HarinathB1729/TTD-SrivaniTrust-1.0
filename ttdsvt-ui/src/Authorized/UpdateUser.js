@@ -15,8 +15,10 @@ const textBoxStyles = {
   marginBottom: "10px",
 };
 
-function UpdateUser(props) {
-  const {isAuthenticated} = useAuth();
+function UpdateUser() {
+  const { isAuthenticated } = useAuth();
+  const token = isAuthenticated.token;
+
   const [newUser, setNewUser] = useState({
     email: "",
     phoneno: "",
@@ -26,19 +28,18 @@ function UpdateUser(props) {
   let location = useLocation();
   const navigate = useNavigate();
   const [changeInData, setChangeInData] = useState(false);
-  const name = location.search.slice(1);
-  // console.log("name",name)
+  const name = location.state["name"];
+  // console.log("props username", location);
 
   useEffect(() => {
-    
     const fetchUserData = async () => {
-      fetchUserApiCall(name,isAuthenticated.token)
+      fetchUserApiCall(name, token)
         .then((data) => {
-            // console.log("response", data);
+          // console.log("response", data);
           setNewUser(data);
         })
         .catch((err) => {
-          if(err.response.status==401) navigate("/")
+          if (err.response.status == 401) navigate("/");
           console.log("Error :", err);
         });
     };
@@ -63,14 +64,14 @@ function UpdateUser(props) {
   const formSubmitHandler = (e) => {
     e.preventDefault();
 
-    updateUserApiCall(newUser,props.token)
+    updateUserApiCall(newUser, token)
       .then((data) => {
         // console.log("response", res);
         window.alert(data["message"]);
         navigate("/auth/users");
       })
       .catch((err) => {
-        if(err.response.status==401) navigate("/")
+        if (err.response.status == 401) navigate("/");
         console.log("Error :", err);
       });
   };

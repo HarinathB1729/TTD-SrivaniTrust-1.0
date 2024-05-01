@@ -5,8 +5,12 @@ import BMColumnOne from "./BMColumnOne";
 import BMColumnTwo from "./BMColumnTwo";
 import BMColumnThree from "./BMColumnThree";
 import { bhajanaMandiraluApiCall } from "../api";
+import { useAuth } from "./AuthProvider";
 
-function BhajanaMandiralu(props) {
+function BhajanaMandiralu() {
+  const { isAuthenticated } = useAuth();
+  const token = isAuthenticated.token;
+
   const bmData_init_values = {
     district: "",
     villagename: "",
@@ -71,13 +75,14 @@ function BhajanaMandiralu(props) {
       }
     }
 
-    bhajanaMandiraluApiCall(formData,props.token)
+    bhajanaMandiraluApiCall(formData, token)
       .then((data) => {
+        // console.log("response",data)
         window.alert(data["message"]);
         navigate("/auth/");
       })
       .catch((err) => {
-        if(err.response.status==401) navigate("/")
+        if (err.response.status == 401) navigate("/");
         console.log("Error :", err);
         setBmdataResponseError(err.response.data);
       });
