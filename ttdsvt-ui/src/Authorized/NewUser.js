@@ -101,7 +101,7 @@ function NewUser() {
       })
       .catch((err) => {
         // console.log("Error :", err);
-        if (err.response.status == 401) navigate("/");
+        if (err.response.status === 401) navigate("/");
         if (err.response.data.email)
           setEmailError({
             error: true,
@@ -113,7 +113,7 @@ function NewUser() {
             message: err.response.data.username[0],
           });
 
-        if (err.response.status == 401) navigate("/");
+        if (err.response.status === 401) navigate("/");
       });
     setNewUser((prev) => ({ ...prev, password: "" }));
     setCnfPwd("");

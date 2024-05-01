@@ -39,7 +39,7 @@ function UpdateUser() {
           setNewUser(data);
         })
         .catch((err) => {
-          if (err.response.status == 401) navigate("/");
+          if (err.response.status === 401) navigate("/");
           console.log("Error :", err);
         });
     };
@@ -71,7 +71,7 @@ function UpdateUser() {
         navigate("/auth/users");
       })
       .catch((err) => {
-        if (err.response.status == 401) navigate("/");
+        if (err.response.status === 401) navigate("/");
         console.log("Error :", err);
       });
   };

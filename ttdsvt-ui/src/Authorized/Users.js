@@ -24,7 +24,7 @@ function Users() {
           // console.log("data",data)
           setUsersData(data);
         } catch (error) {
-          if (error.response.status == 401) navigate("/");
+          if (error.response.status === 401) navigate("/");
           console.log("Error fetching users:", error);
         }
       }

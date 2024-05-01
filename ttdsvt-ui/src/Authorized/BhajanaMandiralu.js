@@ -82,7 +82,7 @@ function BhajanaMandiralu() {
         navigate("/auth/");
       })
       .catch((err) => {
-        if (err.response.status == 401) navigate("/");
+        if (err.response.status === 401) navigate("/");
         console.log("Error :", err);
         setBmdataResponseError(err.response.data);
       });

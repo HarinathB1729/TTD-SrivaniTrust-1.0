@@ -51,7 +51,7 @@ function Profile() {
       })
       .catch((err) => {
         // console.log("Error :", err);
-        if (err.response.status == 401) navigate("/");
+        if (err.response.status === 401) navigate("/");
         setChangeInData(false);
         if (err.response.data.username)
           setUsernameError({
