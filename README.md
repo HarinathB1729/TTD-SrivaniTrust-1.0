@@ -1,1 +1,0 @@
-# TTD-SrivaniTrust-1.0

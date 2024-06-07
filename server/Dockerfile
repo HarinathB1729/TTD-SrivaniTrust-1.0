@@ -1,20 +1,22 @@
-# 
-FROM python:3.9
+FROM python:3.9-slim
 
-# 
-WORKDIR /TTDSVTServer
+WORKDIR /ttdserver
 
-# 
-COPY ./requirements.txt /TTDSVTServer/requirements.txt
+COPY . /ttdserver
 
-# 
-RUN pip install --no-cache-dir --upgrade -r /TTDSVTServer/requirements.txt
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# 
-COPY . .
+# Create a virtual environment and install dependencies
+RUN python -m venv server-env
+RUN /ttdserver/server-env/bin/pip install --upgrade pip
+RUN /ttdserver/server-env/bin/pip install --no-cache-dir -r requirements.txt
 
-#
 EXPOSE 8000
 
-# 
-CMD ["python", "manage.py","runserver"]
+# Use the virtual environment to run the server
+CMD ["/ttdserver/server-env/bin/python", "manage.py", "runserver", "0.0.0.0:8000"]
+

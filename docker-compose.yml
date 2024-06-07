@@ -3,70 +3,21 @@ version: '3'
 #The services section is to define the individual containers (services) that will make up your application.
 services:
 
-# scmxpertlite application service
-  scmserver:
-    image: harinath612/scmserver
+# ttdsvt application service
+  ttdsvtserver:
+    image: harinath612/ttdsvt-server
     ports:
       - "8000:8000"
 
- # scmxpertlite application service
-  scmxpertlite:
-    image: harinath612/scmxpertlite-ui
+ # ttdsvt application service
+  ttdsvtui:
+    image: harinath612/ttdsvt-ui
     ports:
       - "3000:3000"
     depends_on:
-      - scmserver
-       #networks that will be used to connect your services. Networks allow containers to communicate with each other using their service names as hostnames
- 
-  # Zookeeper service for Kafka
-  zookeeper:
-    image: 'bitnami/zookeeper:latest'  
-    ports:
-      - "2181:2181"
-    depends_on:
-      - scmxpertlite
+      - ttdsvtserver
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
- 
-  # Kafka service
-  kafka:
-    image: 'bitnami/kafka:latest'
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_HEAP_OPTS=-Xmx1G  
- 
-  # Server service
-  socketserver:
-    image: harinath612/socketserver:latest
-    ports:
-      - "12121:12121"
-    depends_on:
-      - kafka
-  # Producer service
-  producer:
-    image: harinath612/producer:latest
-    depends_on:
-      - socketserver
-      - kafka
-    environment:
-      - BOOTSTRAP_SERVERS=kafka:9092    
-      - PORT=12121
-      - TOPIC_NAME=ProducerData
-      - HOST=socketserver
-   
-   # Consumer service
-  consumer:
-    image: harinath612/consumer:latest
-    depends_on:
-      - producer
-    environment:
-      - BOOTSTRAP_SERVERS=kafka:9092
-      - TOPIC_NAME=ProducerData
-      - MONGO_URL=mongodb+srv://harinathb1729:yhfiEL5hwEsZpoHP@scmxpertlite.o1m8qrz.mongodb.net/
-      - DATABASE=scmxpertlite
-      - COLLECTION=devices
+      - REACT_APP_BASE_URL=http://localhost:8000/
+      - DEBUG_MODE=true
+
+      

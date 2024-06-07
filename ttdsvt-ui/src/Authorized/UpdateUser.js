@@ -18,7 +18,7 @@ const textBoxStyles = {
 function UpdateUser() {
   const { isAuthenticated } = useAuth();
   const token = isAuthenticated.token;
-
+  
   const [newUser, setNewUser] = useState({
     email: "",
     phoneno: "",
@@ -47,18 +47,22 @@ function UpdateUser() {
   }, [name]);
 
   const dataHandler = (e) => {
-    if (e.target.name === "phoneno") {
-      if (isNaN(e.target.value)) return;
+    const { name, value } = e.target;
+
+    if (name === "phoneno") {
+      if (isNaN(value)) return;
     }
 
-    const sanitized_name = DOMPurify.sanitize(e.target.name);
-    const sanitized_value = DOMPurify.sanitize(e.target.value);
-
+    const sanitized_value = DOMPurify.sanitize(value);
     setNewUser((prev) => ({
       ...prev,
-      [sanitized_name]: sanitized_value,
+      [name]: sanitized_value,
     }));
     setChangeInData(true);
+  };
+
+  const cancelBtnHandler = (e) => {
+    navigate("/auth/users")
   };
 
   const formSubmitHandler = (e) => {
@@ -75,6 +79,7 @@ function UpdateUser() {
         console.log("Error :", err);
       });
   };
+
   // console.log("newuser", newUser);
   //   console.log("location props", location.search.slice(1,));
 
@@ -184,6 +189,14 @@ function UpdateUser() {
                 disabled={!changeInData}
               >
                 Update
+              </Button>
+              <Button
+                style={{ width: "100px" }}
+                variant="contained"
+                color="error"
+                onClick={cancelBtnHandler}
+              >
+                cancel
               </Button>
             </Grid>
           </Grid>
