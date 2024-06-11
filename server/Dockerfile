@@ -1,8 +1,11 @@
-FROM python:3.9-slim
+# Use an official Python runtime as a parent image
+FROM python:3.9
 
-WORKDIR /ttdserver
+# Set the working directory in the container
+WORKDIR /ttdsvt
 
-COPY . /ttdserver
+# Copy the current directory contents into the container at /ttdsvt
+COPY . /ttdsvt
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -10,13 +13,20 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a virtual environment and install dependencies
+# Create a virtual environment
 RUN python -m venv server-env
-RUN /ttdserver/server-env/bin/pip install --upgrade pip
-RUN /ttdserver/server-env/bin/pip install --no-cache-dir -r requirements.txt
 
+# Ensure pip is up-to-date
+RUN /ttdsvt/server-env/bin/pip install --upgrade pip
+
+# Copy requirements.txt separately to leverage Docker cache
+COPY requirements.txt /ttdsvt/requirements.txt
+
+# Install Python dependencies with verbose output
+RUN /ttdsvt/server-env/bin/pip install --no-cache-dir -r /ttdsvt/requirements.txt --verbose
+
+# Make port 8000 available to the world outside this container
 EXPOSE 8000
 
 # Use the virtual environment to run the server
-CMD ["/ttdserver/server-env/bin/python", "manage.py", "runserver", "0.0.0.0:8000"]
-
+CMD ["/ttdsvt/server-env/bin/python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\BHN\PROJECTS\WORKING\TTD Srivari Trust\TTD-SrivaniTrust-1.0\server\server-env
+set VIRTUAL_ENV=C:\BHN\PROJECTS\COMPLETED\TTD Srivari Trust\TTD-SrivaniTrust-1.0\server\server-env
 
 if not defined PROMPT set PROMPT=$P$G
 

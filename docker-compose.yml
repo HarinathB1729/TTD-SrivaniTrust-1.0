@@ -1,23 +1,26 @@
-version: '3'
- 
-#The services section is to define the individual containers (services) that will make up your application.
-services:
+version: '3.8'
 
-# ttdsvt application service
-  ttdsvtserver:
-    image: harinath612/ttdsvt-server
+services:
+  database:
+    image: mysql:8.0
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ttdsvt
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+
+  web:
+    build: .
+    command: /ttdsvt/server-env/bin/python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/ttdsvt
     ports:
       - "8000:8000"
-
- # ttdsvt application service
-  ttdsvtui:
-    image: harinath612/ttdsvt-ui
-    ports:
-      - "3000:3000"
     depends_on:
-      - ttdsvtserver
-    environment:
-      - REACT_APP_BASE_URL=http://localhost:8000/
-      - DEBUG_MODE=true
+      - database
 
-      
+volumes:
+  mysql_data:

@@ -147,3 +147,28 @@ export const changePasswordApiCall = async (userCredentials, token) => {
     throw error;
   }
 };
+
+
+//GENERIC FUNCTION
+const apiCallingFunction = async (url, method, postData, token) => {
+  try {
+    const response = await api(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(postData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message);
+    }
+   
+    return response.data;
+  } catch (error) {
+    console.error("Error User Update:", error);
+    throw error;
+  }
+};
